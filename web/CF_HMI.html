@@ -1,0 +1,245 @@
+<!DOCTYPE HTML>
+<html lang="us">
+   <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>CF Lab 314/5</title>
+      <!-- ** CSS ** -->
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css">
+      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap-theme.min.css">
+      <link rel="stylesheet" href="css/panes.css" type="text/css" />
+      <link rel="stylesheet" href="css/index.css" type="text/css" />
+      
+      <!-- ** Javascript ** -->
+      <script type="text/javascript" src="lib/jquery-2.2.4.min.js"></script>
+      <script type="text/javascript" src="lib/bootstrap/js/bootstrap.min.js"></script>
+      <script type="text/javascript" src="lib/c0lor.min.js"></script>
+      <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+
+      <!-- ** Angular controllers ** -->
+      <script type="text/javascript" src="lib/angular.min.js"></script>
+      <script type="text/javascript" src="js/CF_HMI_Ctrl.js"></script>
+   </head>
+   <body>
+   <div class="p-page" ng-app="myApp" ng-controller="CF_HMI">
+      <div id="banner" class="p-header p-row">
+         <h1>Continuous Formulation Lab - 314/5</h1>
+      </div>
+      <div id="main" class="p-body p-row">
+         <div id="divValues" class="p-left p-col container-fluid">
+            <!-- API Pump -->
+            <div class="row clearfix">
+               <div class="col-xs-12 sidebarheading">API Pump</div>
+               <div class="col-xs-6 column btn-div">
+                  <button type="button" class="btn btn-success btn-sm btn-block" ng-disabled='(values.P9999A_RUN.value === true || values.P9999A_LOCAL.value === true)' ng-click="writeVals('P9999A_Run_RQ',1);">
+                     <span class="glyphicon glyphicon-play"></span> Start
+                  </button>
+               </div>
+               <div class="col-xs-6 column btn-div">
+                  <button type="button" class="btn btn-danger btn-sm btn-block active" ng-disabled='(values.P9999A_RUN.value === false)' ng-click="writeVals('P9999A_Run_RQ',0);">
+                     <span class="glyphicon glyphicon-stop"></span> Stop
+                  </button>
+               </div>
+               <div class="col-xs-4 column btn-div">
+                  <button type="button" class="btn btn-default btn-sm btn-block" ng-disabled='(values.P9999A_LOCAL.value === false)' ng-click="writeVals('P9999A_Local_RQ',0);">Remote</button>
+               </div>
+               <div class="col-xs-4 column btn-div">
+                  <button type="button" class="btn btn-default btn-sm btn-block active" ng-disabled='(values.P9999A_LOCAL.value === true)' ng-click="writeVals('P9999A_Local_RQ',1);">Local</button>
+               </div>
+               <div class="col-xs-4 column btn-div">
+                  <button type="button" class="btn btn-warning btn-sm btn-block active"
+                  ng-disabled='(values.P9999A_LOCAL.value === true) || (values.P9999A_RUN.value === false)'
+                  ng-mousedown="prime('SC9999A',true);"
+                  ng-mouseup="prime('SC9999A',false);"
+                  ng-mouseleave="prime('SC9999A',false);">
+                     <span class="glyphicon glyphicon-forward"></span> Prime
+                  </button>
+               </div>
+               <!-- rpm setpoint -->
+               <div class="input-group">
+                  <div class="config-entries input-group-addon">SP:</div>
+                 <input type="number" class="config-entries form-control" ng-model="ctlValues.write.SC9999A_SP.input" ng-focus="ctlValues.write.SC9999A_SP.input = values.SC9999A_OUT.value" max="600" min="0" id="inputP9999A_SP" placeholder="Speed SP">
+                  <div class="config-entries input-group-addon">RPM
+                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.SC9999A_SP.input==null"
+                           ng-click="writeVals('SC9999A_SP',ctlValues.write.SC9999A_SP.input);ctlValues.write.SC9999A_SP.input=null;">
+                           <span class="glyphicon glyphicon-ok"></span></button>
+                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.SC9999A_SP.input==null"
+                           ng-click="ctlValues.write.SC9999A_SP.input=null;">
+                           <span class="glyphicon glyphicon-remove"></span></button>
+                  </div>
+               </div>
+               <!-- flow setpoint -->
+               <div class="input-group">
+                  <div class="config-entries input-group-addon">SP:</div>
+                 <input type="number" class="config-entries form-control" ng-model="ctlValues.write.SC9999A_FlowSP.input" ng-focus="ctlValues.write.SC9999A_FlowSP.input = values.SC9999A_FlowOUT.value" max="200" min="0" id="inputP9999A_FlowSP" placeholder="Flow SP">
+                  <div class="config-entries input-group-addon">ml/min
+                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.SC9999A_FlowSP.input==null"
+                           ng-click="writeVals('SC9999A_FlowSP',ctlValues.write.SC9999A_FlowSP.input);ctlValues.write.SC9999A_FlowSP.input=null;">
+                           <span class="glyphicon glyphicon-ok"></span></button>
+                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.SC9999A_FlowSP.input==null"
+                           ng-click="ctlValues.write.SC9999A_FlowSP.input=null;">
+                           <span class="glyphicon glyphicon-remove"></span></button>
+                  </div>
+               </div>
+               <div class="col-xs-4 column  btn-div">
+                  <div class="dropdown">
+                    <button class="btn btn-block btn-default dropdown-toggle btn-xs" type="button" id="dropdownTubeSizeA" data-toggle="dropdown">
+                      <strong>Tubing</strong>
+                      <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownTubeSizeA">
+                      <li ng-repeat="size in tubeSizes" role="presentation" ng-click="setTubingSize('P9999A',$index);">
+                        <a role="menuitem" tabindex="-1" href="#">{{size.name}}</a>
+                      </li>
+                    </ul>
+                  </div>                        
+               </div>
+               <div class="col-xs-8 column config-entries config-entries-btn">{{arrayLookup(tubeSizes,values.P9999A_TubeSize.value)}}</div>
+            </div>
+            <div class="row clearfix">
+               <div class="col-xs-4 column  btn-div">
+                  <div class="dropdown">
+                    <button class="btn btn-block btn-default dropdown-toggle btn-xs" type="button" id="dropdownHeadsA" data-toggle="dropdown">
+                      <strong>Heads</strong>
+                      <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownHeadsA">
+                      <li ng-repeat="heads in headNumbers" role="presentation" ng-click="setHeads('P9999A',$index);">
+                        <a role="menuitem" tabindex="-1" href="#">{{heads.name}}</a>
+                      </li>
+                    </ul>
+                  </div>                        
+               </div>
+               <div class="col-xs-8 column config-entries config-entries-btn">{{arrayLookup(headNumbers,values.P9999A_Heads.value)}}</div>
+            </div>
+
+            <!-- Buffer Pump -->
+            <div class="row clearfix">
+               <div class="col-xs-12 sidebarheading">Buffer Pump</div>
+               <div class="col-xs-6 column btn-div">
+                  <button type="button" class="btn btn-success btn-sm btn-block" ng-disabled='(values.P9999B_RUN.value === true || values.P9999B_LOCAL.value === true)' ng-click="writeVals('P9999B_Run_RQ',1);">
+                     <span class="glyphicon glyphicon-play"></span> Start
+                  </button>
+               </div>
+               <div class="col-xs-6 column btn-div">
+                  <button type="button" class="btn btn-danger btn-sm btn-block active" ng-disabled='(values.P9999B_RUN.value === false)' ng-click="writeVals('P9999B_Run_RQ',0);">
+                     <span class="glyphicon glyphicon-stop"></span> Stop
+                  </button>
+               </div>
+               <div class="col-xs-4 column btn-div">
+                  <button type="button" class="btn btn-default btn-sm btn-block" ng-disabled='(values.P9999B_LOCAL.value === false)' ng-click="writeVals('P9999B_Local_RQ',0);">Remote</button>
+               </div>
+               <div class="col-xs-4 column btn-div">
+                  <button type="button" class="btn btn-default btn-sm btn-block active" ng-disabled='(values.P9999B_LOCAL.value === true)' ng-click="writeVals('P9999B_Local_RQ',1);">Local</button>
+               </div>
+               <div class="col-xs-4 column btn-div">
+                  <button type="button" class="btn btn-warning btn-sm btn-block active"
+                  ng-disabled='(values.P9999B_LOCAL.value === true) || (values.P9999B_RUN.value === false)'
+                  ng-mousedown="prime('SC9999B',true);"
+                  ng-mouseup="prime('SC9999B',false);"
+                  ng-mouseleave="prime('SC9999B',false);">
+                     <span class="glyphicon glyphicon-forward"></span> Prime
+                  </button>
+               </div>
+               <!-- rpm setpoint -->
+               <div class="input-group">
+                  <div class="config-entries input-group-addon">SP:</div>
+                 <input type="number" class="config-entries form-control" ng-model="ctlValues.write.SC9999B_SP.input" ng-focus="ctlValues.write.SC9999B_SP.input = values.SC9999B_OUT.value" max="600" min="0" id="inputP9999B_SP" placeholder="Speed SP">
+                  <div class="config-entries input-group-addon">RPM
+                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.SC9999B_SP.input==null"
+                           ng-click="writeVals('SC9999B_SP',ctlValues.write.SC9999B_SP.input);ctlValues.write.SC9999B_SP.input=null;">
+                           <span class="glyphicon glyphicon-ok"></span></button>
+                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.SC9999B_SP.input==null"
+                           ng-click="ctlValues.write.SC9999B_SP.input=null;">
+                           <span class="glyphicon glyphicon-remove"></span></button>
+                  </div>
+               </div>
+               <!-- flow setpoint -->
+               <div class="input-group">
+                  <div class="config-entries input-group-addon">SP:</div>
+                 <input type="number" class="config-entries form-control" ng-model="ctlValues.write.SC9999B_FlowSP.input" ng-focus="ctlValues.write.SC9999B_FlowSP.input = values.SC9999B_FlowOUT.value" max="200" min="0" id="inputP9999B_FlowSP" placeholder="Flow SP">
+                  <div class="config-entries input-group-addon">ml/min
+                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.SC9999B_FlowSP.input==null"
+                           ng-click="writeVals('SC9999B_FlowSP',ctlValues.write.SC9999B_FlowSP.input);ctlValues.write.SC9999B_FlowSP.input=null;">
+                           <span class="glyphicon glyphicon-ok"></span></button>
+                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.SC9999B_FlowSP.input==null"
+                           ng-click="ctlValues.write.SC9999B_FlowSP.input=null;">
+                           <span class="glyphicon glyphicon-remove"></span></button>
+                  </div>
+               </div>
+               <div class="col-xs-4 column  btn-div">
+                  <div class="dropdown">
+                    <button class="btn btn-block btn-default dropdown-toggle btn-xs" type="button" id="dropdownTubeSizeA" data-toggle="dropdown">
+                      <strong>Tubing</strong>
+                      <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownTubeSizeA">
+                      <li ng-repeat="size in tubeSizes" role="presentation" ng-click="setTubingSize('P9999B',$index);">
+                        <a role="menuitem" tabindex="-1" href="#">{{size.name}}</a>
+                      </li>
+                    </ul>
+                  </div>                        
+               </div>
+               <div class="col-xs-8 column config-entries config-entries-btn">{{arrayLookup(tubeSizes,values.P9999B_TubeSize.value)}}</div>
+            </div>
+            <div class="row clearfix">
+               <div class="col-xs-4 column  btn-div">
+                  <div class="dropdown">
+                    <button class="btn btn-block btn-default dropdown-toggle btn-xs" type="button" id="dropdownHeadsA" data-toggle="dropdown">
+                      <strong>Heads</strong>
+                      <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownHeadsA">
+                      <li ng-repeat="heads in headNumbers" role="presentation" ng-click="setHeads('P9999B',$index);">
+                        <a role="menuitem" tabindex="-1" href="#">{{heads.name}}</a>
+                      </li>
+                    </ul>
+                  </div>                        
+               </div>
+               <div class="col-xs-8 column config-entries config-entries-btn">{{arrayLookup(headNumbers,values.P9999B_Heads.value)}}</div>
+            </div>
+            <!-- Totalizers -->
+            <div class="row clearfix">
+               <div class="col-xs-12 sidebarheading">Totalizers</div>
+            </div>
+            <div class="row clearfix">
+               <!-- API totalizer -->
+               <div class="col-xs-4 column config-entries config-entries-btn text-right">API:</div>
+               <div class="col-xs-5 column config-entries config-entries-btn">{{values.FQ9999A_total.value.toFixed(1)}} mL</div>
+               <div class="col-xs-3 column btn-div">
+                  <button type="button" class="btn btn-success btn-xs btn-block" ng-click="writeVals('FQ9999A_Reset_RQ',1);">Reset</button>
+               </div> 
+               <!-- Buffer totalizer -->
+               <div class="col-xs-4 column config-entries config-entries-btn text-right">Buffer:</div>
+               <div class="col-xs-5 column config-entries config-entries-btn">{{values.FQ9999B_total.value.toFixed(1)}} mL</div>
+               <div class="col-xs-3 column btn-div">
+                  <button type="button" class="btn btn-success btn-xs btn-block" ng-click="writeVals('FQ9999B_Reset_RQ',1);">Reset</button>
+               </div>
+               <!-- Product totalizer -->
+               <div class="col-xs-4 column config-entries config-entries-btn text-right">Product:</div>
+               <div class="col-xs-5 column config-entries config-entries-btn">{{values.FQ9999C_total.value.toFixed(1)}} mL</div>
+               <div class="col-xs-3 column btn-div">
+                  <button type="button" class="btn btn-success btn-xs btn-block" ng-click="writeVals('FQ9999C_Reset_RQ',1);">Reset</button>
+               </div>
+            </div>
+
+
+            <hr class="xs"/>                        
+
+         </div>
+         <div id="divDisplay" class="p-right p-col">
+            <div id="divHMI" class="p-row" ng-include="'CFDiagram.svg'">
+            </div>
+            <div id="divGraphs" class="p-row">
+               <p id="t1">{{values.ST9999B.PV.value}}</p>
+               <p id="t2"></p>            
+            </div>
+         </div>
+
+      </div>
+      <div id="footer" class="p-footer p-row">
+      </div>
+   </div>
+   </body>
+</html>
