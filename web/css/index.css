@@ -58,11 +58,20 @@ svg {
   stroke-width:3px !important;
   cursor: pointer;
    }
-   
-.pump.running {
-  fill:#00FF00 !important;
-   }
-   
+ 
+.hmi-active { fill: #00FF00 !important}
+.hmi-inactive { fill: #bebebeff !important}
+.pump.running { fill:#00FF00 !important;}
+.fv-common { fill: #00FF00 !important}
+
+input.svgInput {
+    height: 28px;
+    width: 162px;
+    font-size: 24px;
+    text-align: center;
+    background-color: yellow;
+}
+
 .sp-text:hover {
   opacity:0.5 !important;
   cursor: pointer;

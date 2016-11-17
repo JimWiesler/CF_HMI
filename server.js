@@ -5,7 +5,9 @@ var ADSAdapter = require('./ADSAdapter.js');
 var w = require('./WebServer.js');
 
 //Start the ADS connection
-var ads = new ADSAdapter.ADS({name: "CF314", id: '5.31.160.194.1.1', port: 851, updateMS: 100});
+var ads = new ADSAdapter.ADS({name: "CF314", id: '5.31.160.194.1.1', 
+                              port: 851, updateMS: 100, heartbeatVariable: "main.heartbeat"});
+// var ads = new ADSAdapter.ADS({name: "CF314", id: '5.31.160.194.1.1', port: 999, updateMS: 100});
 ads.start();
 
 //Start web server

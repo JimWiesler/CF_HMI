@@ -2,6 +2,27 @@ var util = require("util");
 var events = require("events");
 var TwinCAT = require("./ADSNode/TwinCAT_ADS_Node.node");
 
+/* Default init function that is called when module created */
+// void init(Handle<Object> exports)
+// {
+	// NODE_SET_METHOD(exports, "OpenCommunicationPort", OpenCommunicationPort);
+	// NODE_SET_METHOD(exports, "CloseCommunicationPort", CloseCommunicationPort);
+	// NODE_SET_METHOD(exports, "StartPLC", StartPLC);
+	// NODE_SET_METHOD(exports, "StopPLC", StopPLC);
+	// NODE_SET_METHOD(exports, "ReadValue", ReadVariableByName);
+	// NODE_SET_METHOD(exports, "ReadArray", ReadArrayByName);
+	// NODE_SET_METHOD(exports, "WriteValue", WriteValueToVariable);
+	// NODE_SET_METHOD(exports, "BrowseVariables", BrowseVariables);
+	// NODE_SET_METHOD(exports, "SubscribeToVariable", SubscribeToVariable);
+	// NODE_SET_METHOD(exports, "UnsubscribeFromVariable", UnsubscribeFromVariable);
+	// NODE_SET_METHOD(exports, "SubscribeToStatusChangesPLC", SubscribeToStatusChangesPLC); // Start stop or run changes
+	// NODE_SET_METHOD(exports, "SubscribeToStatusChangesRouter", SubscribeToStatusChangesRouter); //ADS router symbol table changes
+	// NODE_SET_METHOD(exports, "SUCCESS", CheckIfSuccess);
+	// NODE_SET_METHOD(exports, "ERROR", CheckIfError);
+// }
+
+
+
 //*******************************************
 // ADS object - writes and monitors values in Beckhoff TwinCAT systems
 //   Call with config object {name: name, id: TwinCATNetID, port: TwinCATPort}
@@ -16,6 +37,9 @@ function ADS(config) {
    this.updateMS = config.updateMS || 250; // MS between emitting the list of changed variable values, cuts down on bandwidth
    this.interval = null;
    this.updateInterval(this.updateMS);
+   this.heartbeatVariable = config.heartbeatVariable || "";
+   this.lastHeartbeat = -1;
+   this.adsPortOpen = false;
 }
 util.inherits(ADS, events.EventEmitter);
 
@@ -24,9 +48,24 @@ util.inherits(ADS, events.EventEmitter);
 //*******************************************
 ADS.prototype.start = function() {
    try {
-      TwinCAT.OpenCommunicationPort(this.CONTROLLER_NET_ID, this.CONTROLLER_ADS_PORT);
+      var error = TwinCAT.OpenCommunicationPort(this.CONTROLLER_NET_ID, this.CONTROLLER_ADS_PORT);
+      if (this.heartbeatVariable !== "") {
+         var me = this;
+         setInterval(function () {me.readHeartbeat(me);}, 1000);
+      }
    } catch(err) {
       console.log("Failed to open TwinCAT port: " + err);
+   }
+};
+
+//*******************************************
+// Monitor method
+//*******************************************
+ADS.prototype.monitor = function() {
+   try {
+      var error = TwinCAT.MonitorCommunicationPort(function (args) {console.log('**callback Subscribe to Monitor**');console.dir(args);});
+   } catch(err) {
+      console.log("Failed to monitor TwinCAT port: " + err);
    }
 };
 
@@ -38,6 +77,24 @@ ADS.prototype.stop = function() {
       TwinCAT.CloseCommunicationPort();
    } catch(err) {
       console.log("Failed to close TwinCAT port: " + err);
+   }
+};
+
+//*******************************************
+// Read method
+//*******************************************
+ADS.prototype.read = function(tags) {
+   try {
+      var error;
+      if (!Array.isArray(tags)) {tags = [tags];}
+      var t, results = [], r;
+      while ((t = tags.pop()) !== undefined) {
+         r = TwinCAT.ReadValue(t);
+         results.push({tag: t, value: r})
+      }
+      return results;
+   } catch(err) {
+      console.log("Failed to read value via ADS : " + err);
    }
 };
 
@@ -65,11 +122,13 @@ ADS.prototype.write = function(tags) {
 ADS.prototype.subscribe = function(tags) {
    try {
       if (!Array.isArray(tags)) {tags = [tags];}
-      var t;
+      var t, result;
       while ((t = tags.pop()) !== undefined) {
          if (typeof this.subscribed[t] === 'undefined') { //tag has not already been subscribed
             this.subscribed[t] = {value: null, ts: null};
-            TwinCAT.SubscribeToVariable(t, this.subscribeCallback, {ads: this}, this.updateMS);
+            result = TwinCAT.SubscribeToVariable(t, this.subscribeCallback, {ads: this}, this.updateMS);
+            // console.log('*** Result of subscribe ****');
+            // console.dir(result);            
          }
       }
    } catch(err) {
@@ -97,6 +156,23 @@ ADS.prototype.subscribeCallback = function(arg) {
 };
 
 //*******************************************
+// Resubscribe method
+//   Resubscribe to variables in this.subscribed - need to do this when download has occurred
+//*******************************************
+ADS.prototype.resubscribe = function() {
+   var result = TwinCAT.ResubscribeToVariables();
+   // var tags = Object.keys(this.subscribed);
+   // try {
+      // var t, result;
+      // while ((t = tags.pop()) !== undefined) {
+         // result = TwinCAT.SubscribeToVariable(t, this.subscribeCallback, {ads: this}, this.updateMS);
+      // }
+   // } catch(err) {
+      // console.log("Failed to resubscribe to variable %s: Error %s", tag.value, err);
+   // }
+};
+
+//*******************************************
 // Interval method
 //   Call with single tag name or array of tag names in format ['POU.Variable', 'POU.Variable']
 //*******************************************
@@ -107,6 +183,33 @@ ADS.prototype.updateInterval = function(ms) {
    }
    this.interval = setInterval(function() {emitChanges(me);}, me.updateMS);
 };
+
+//*******************************************
+// readHeartbeat method
+//   Called every second to set status of this.adsPortOpen
+//*******************************************
+ADS.prototype.readHeartbeat = function(ads) {
+   try {
+      var res = ads.read(ads.heartbeatVariable);
+      if ((typeof res[0].value !== 'object') && (res[0].value !== ads.lastHeartbeat) && res[0].value > 10000) {
+         if (!ads.adsPortOpen) {
+            console.log("*** ADS Communication Active: "+(new Date()).toISOString());
+            ads.adsPortOpen = true;
+            ads.resubscribe(); //resubscribe to ADS read variables
+         }
+      } else {
+          if (ads.adsPortOpen) {
+            console.log("*** ADS Communication Interrupted: "+(new Date()).toISOString());
+            ads.adsPortOpen = false;
+         }
+      }
+      if (typeof res[0].value !== 'object') {
+         ads.lastHeartbeat = res[0].value;
+      }
+   } catch (e) {
+     console.log(e, " read heartbeat failed") ;
+   }
+}
 
 //*******************************************
 // Function to emit changes object
