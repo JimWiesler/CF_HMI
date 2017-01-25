@@ -15,8 +15,8 @@ pre.normal{background-color:transparent;border:none;border-left-width:0;overflow
 /* CSS for generic web app pane layout in panes.css - see http://blog.stevensanderson.com/2011/10/05/full-height-app-layouts-a-css-trick-to-make-it-easier/ */
 
 /* Div layout specific for this page */
-#divValues{ width: 200px;}
-#divDisplay{ left: 200px; right: 0;}
+#divValues{ width: 240px;}
+#divDisplay{ left: 240px; right: 0;}
 
 #divHMI{ height:500px; top: 0px; }
 #divGraphs{  top: 500px; bottom: 0px; }

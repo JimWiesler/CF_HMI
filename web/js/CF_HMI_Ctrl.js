@@ -41,6 +41,8 @@ var ctlValues = {
       "AC9999C_concSP" : {src: {}, tag: "MAIN.AC9999C.conc.sp"},
       "AC9999C_cSP" : {src: {}, tag: "MAIN.AC9999C.c.sp"},
       "AC9999C_MODE" : {src: {}, tag: "MAIN.AC9999C.mode"},
+      "AC9999C_filling" : {src: {}, tag: "MAIN.AC9999C.filling"},
+      "AC9999C_fillMODE" : {src: {}, tag: "MAIN.AC9999C.autoFill"},
       //**********Reveal******************
       "AT9999C_PV" : {src: {}, tag: "MAIN.AT9999C.pv"},
       //**********ColorWise******************
@@ -71,6 +73,7 @@ var ctlValues = {
       "AC9999C_concSP" : {evt: 'ADSWrite', tag: "MAIN.AC9999C.conc.rq", input: null},
       "AC9999C_cSP" : {evt: 'ADSWrite', tag: "MAIN.AC9999C.c.rq", input: null},
       "AC9999C_MODE" : {evt: 'ADSWrite', tag: "MAIN.AC9999C.mode", input: null},
+      "AC9999C_fillMODE" : {evt: 'ADSWrite', tag: "MAIN.AC9999C.autoFill", input: null},
       "P9999B_Local_RQ" : {evt: 'ADSWrite', tag: "MAIN.P9999B.nLocal_RQ"},
       "P9999B_Run_RQ" : {evt: 'ADSWrite', tag: "MAIN.P9999B.nRun_RQ"},
       "P9999B_TubeSize" : {evt: 'ADSWrite', tag: "MAIN.P9999B.nTubeSize"},
@@ -133,6 +136,7 @@ app.controller("CF_HMI", ['$scope', '$http', function($scope, $http) {
       'FC9999B2_MODE' : {1: 'Manual', 2: 'Auto', value: 1},
       'FC9999B2_SP' : {eu: 'mg/mL', value: 0.0},
       'AC9999C_MODE' : {0: 'Manual', 2: 'Auto', value: 0},
+      'AC9999C_fillMODE' : {0: 'OFF', 1: 'ON', value: false},
       'FV9999C_PV' : {'false': 'Waste', 'true': 'Filler', value: false},
       'FQ9999A_total' : {eu: 'mL', value: 0.0},
       'FQ9999B_total' : {eu: 'mL', value: 0.0},

@@ -28,6 +28,68 @@
       </div>
       <div id="main" class="p-body p-row">
          <div id="divValues" class="p-left p-col container-fluid">
+			<!-- Concentration Control-->
+            <div class="row clearfix">
+               <div class="col-xs-12 sidebarheading">Conc Control</div>
+               <!-- conc controller mode -->
+               <div class="col-xs-6 column btn-div">
+                  <!-- <button type="button" class="btn btn-success btn-sm btn-block" ng-disabled='(values.FC9999B1_MODE.value === 2)' ng-click="writeVals('FC9999B1_MODE',2);"> -->
+                  <button type="button" class="btn btn-success btn-sm btn-block" ng-disabled='(values.AC9999C_MODE.value === 1)' ng-click="writeVals('AC9999C_MODE',1);">
+                     <span class="glyphicon glyphicon-ok"></span> CC Auto
+                  </button>
+               </div>
+               <div class="col-xs-6 column btn-div">
+                  <button type="button" class="btn btn-danger btn-sm btn-block active" ng-disabled='(values.AC9999C_MODE.value === 0)' ng-click="writeVals('AC9999C_MODE',0);">
+                  <!-- <button type="button" class="btn btn-danger btn-sm btn-block active" ng-disabled='(values.FC9999B2_MODE.value === 1)' ng-click="writeVals('FC9999B2_MODE',1);"> -->
+                     <span class="glyphicon glyphicon-remove"></span> CC Manual
+                  </button>
+               </div>
+			   <!-- conc controller FILLING mode -->
+               <div class="col-xs-6 column btn-div">
+                  <!-- <button type="button" class="btn btn-success btn-sm btn-block" ng-disabled='(values.FC9999B1_MODE.value === 2)' ng-click="writeVals('FC9999B1_MODE',2);"> -->
+                  <button type="button" class="btn btn-success btn-sm btn-block" ng-disabled='(values.AC9999C_fillMODE.value === 1 || values.AC9999C_MODE.value === 0)' ng-click="writeVals('AC9999C_fillMODE',true);">
+                     <span class="glyphicon glyphicon-ok"></span> FillMode ON
+                  </button>
+               </div>
+               <div class="col-xs-6 column btn-div">
+                  <button type="button" class="btn btn-danger btn-sm btn-block active" ng-disabled='(values.AC9999C_fillMODE.value === 0 || values.AC9999C_MODE.value === 0)' ng-click="writeVals('AC9999C_fillMODE',false);">
+                  <!-- <button type="button" class="btn btn-danger btn-sm btn-block active" ng-disabled='(values.FC9999B2_MODE.value === 1)' ng-click="writeVals('FC9999B2_MODE',1);"> -->
+                     <span class="glyphicon glyphicon-remove"></span> FillMode OFF
+                  </button>
+               </div>
+			   <!-- Display Fill MODE 
+               <div class="col-xs-4 column config-entries config-entries-btn text-right">Fill Mode:</div>
+               <div class="col-xs-5 column config-entries config-entries-btn">{{values.AC9999C_fillMODE.value}}</div>
+				-->
+				
+			   <!-- total flow setpoint -->
+               <div class="input-group">
+                  <div class="config-entries input-group-addon">SP:</div>
+                  <input type="number" class="config-entries form-control" ng-model="ctlValues.write.AC9999C_cSP.input" ng-focus="ctlValues.write.AC9999C_cSP.input = values.AC9999C_cSP.value" max="200" min="0" id="inputAC9999C_cSP" placeholder="Flow SP">
+                  <div class="config-entries input-group-addon">ml/min
+                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.AC9999C_cSP.input==null"
+                           ng-click="writeVals('AC9999C_cSP',ctlValues.write.AC9999C_cSP.input);ctlValues.write.AC9999C_cSP.input=null;">
+                           <span class="glyphicon glyphicon-ok"></span></button>
+                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.AC9999C_cSP.input==null"
+                           ng-click="ctlValues.write.AC9999C_cSP.input=null;">
+                           <span class="glyphicon glyphicon-remove"></span></button>
+                  </div>
+               </div>
+				<!-- conc setpoint -->
+               <div class="input-group">
+                  <div class="config-entries input-group-addon">SP:</div>
+                  <input type="number" class="config-entries form-control" ng-model="ctlValues.write.AC9999C_concSP.input" ng-focus="ctlValues.write.AC9999C_concSP.input = values.AC9999C_concSP.value" max="200" min="0" id="AC9999C_concSP" placeholder="Conc SP">
+                  <div class="config-entries input-group-addon">mg/ml
+                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.AC9999C_concSP.input==null"
+                           ng-click="writeVals('AC9999C_concSP',ctlValues.write.AC9999C_concSP.input);ctlValues.write.AC9999C_concSP.input=null;">
+                           <span class="glyphicon glyphicon-ok"></span></button>
+                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.AC9999C_concSP.input==null"
+                           ng-click="ctlValues.write.AC9999C_concSP.input=null;">
+                           <span class="glyphicon glyphicon-remove"></span></button>
+                  </div>
+               </div>
+			</div>
+			</br>
             <!-- API Pump -->
             <div class="row clearfix">
                <div class="col-xs-12 sidebarheading">API Pump</div>
@@ -96,7 +158,7 @@
                   </div>
                </div>
             </div>
-
+			</br>
             <!-- Buffer Pump -->
             <div class="row clearfix">
                <div class="col-xs-12 sidebarheading">Buffer Pump</div>
@@ -165,6 +227,7 @@
                   </div>
                </div>
             </div>
+			</br>
             <!-- Totalizers -->
             <div class="row clearfix">
                <div class="col-xs-12 sidebarheading">Totalizers</div>
@@ -190,49 +253,7 @@
                </div>
             </div>
 
-			<!-- Concentration Control-->
-            <div class="row clearfix">
-               <div class="col-xs-12 sidebarheading">Conc Control</div>
-               <!-- conc controller mode -->
-               <div class="col-xs-6 column btn-div">
-                  <!-- <button type="button" class="btn btn-success btn-sm btn-block" ng-disabled='(values.FC9999B1_MODE.value === 2)' ng-click="writeVals('FC9999B1_MODE',2);"> -->
-                  <button type="button" class="btn btn-success btn-sm btn-block" ng-disabled='(values.AC9999C_MODE.value === 1)' ng-click="writeVals('AC9999C_MODE',1);">
-                     <span class="glyphicon glyphicon-ok"></span> CC Auto
-                  </button>
-               </div>
-               <div class="col-xs-6 column btn-div">
-                  <button type="button" class="btn btn-danger btn-sm btn-block active" ng-disabled='(values.AC9999C_MODE.value === 0)' ng-click="writeVals('AC9999C_MODE',0);">
-                  <!-- <button type="button" class="btn btn-danger btn-sm btn-block active" ng-disabled='(values.FC9999B2_MODE.value === 1)' ng-click="writeVals('FC9999B2_MODE',1);"> -->
-                     <span class="glyphicon glyphicon-remove"></span> CC Manual
-                  </button>
-               </div>
-			   <!-- total flow setpoint -->
-               <div class="input-group">
-                  <div class="config-entries input-group-addon">SP:</div>
-                  <input type="number" class="config-entries form-control" ng-model="ctlValues.write.AC9999C_cSP.input" ng-focus="ctlValues.write.AC9999C_cSP.input = values.AC9999C_cSP.value" max="200" min="0" id="inputAC9999C_cSP" placeholder="Flow SP">
-                  <div class="config-entries input-group-addon">ml/min
-                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.AC9999C_cSP.input==null"
-                           ng-click="writeVals('AC9999C_cSP',ctlValues.write.AC9999C_cSP.input);ctlValues.write.AC9999C_cSP.input=null;">
-                           <span class="glyphicon glyphicon-ok"></span></button>
-                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.AC9999C_cSP.input==null"
-                           ng-click="ctlValues.write.AC9999C_cSP.input=null;">
-                           <span class="glyphicon glyphicon-remove"></span></button>
-                  </div>
-               </div>
-				<!-- conc setpoint -->
-               <div class="input-group">
-                  <div class="config-entries input-group-addon">SP:</div>
-                  <input type="number" class="config-entries form-control" ng-model="ctlValues.write.AC9999C_concSP.input" ng-focus="ctlValues.write.AC9999C_concSP.input = values.AC9999C_concSP.value" max="200" min="0" id="AC9999C_concSP" placeholder="Conc SP">
-                  <div class="config-entries input-group-addon">mg/ml
-                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.AC9999C_concSP.input==null"
-                           ng-click="writeVals('AC9999C_concSP',ctlValues.write.AC9999C_concSP.input);ctlValues.write.AC9999C_concSP.input=null;">
-                           <span class="glyphicon glyphicon-ok"></span></button>
-                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.AC9999C_concSP.input==null"
-                           ng-click="ctlValues.write.AC9999C_concSP.input=null;">
-                           <span class="glyphicon glyphicon-remove"></span></button>
-                  </div>
-               </div>
-			</div>
+			
 			
 
             <hr class="xs"/>                        
