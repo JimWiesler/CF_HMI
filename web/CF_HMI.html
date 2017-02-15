@@ -6,19 +6,24 @@
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <title>CF Lab 314/5</title>
       <!-- ** CSS ** -->
-      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css">
-      <link rel="stylesheet" href="lib/bootstrap/css/bootstrap-theme.min.css">
+      <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+      <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap-theme.min.css">
       <link rel="stylesheet" href="css/panes.css" type="text/css" />
       <link rel="stylesheet" href="css/index.css" type="text/css" />
       
       <!-- ** Javascript ** -->
-      <script type="text/javascript" src="lib/jquery-2.2.4.min.js"></script>
-      <script type="text/javascript" src="lib/bootstrap/js/bootstrap.min.js"></script>
+      <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
+      <script type="text/javascript" src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
       <script type="text/javascript" src="lib/c0lor.min.js"></script>
+      <script type="text/javascript" src="node_modules/highcharts/highcharts.js"></script>
       <script type="text/javascript" src="/socket.io/socket.io.js"></script>
 
+      <!-- ** Chart Options ** -->
+      <script type="text/javascript" src="js/chartFlowOptions.js"></script>
+      <script type="text/javascript" src="js/chartConcentrationOptions.js"></script>
+      
       <!-- ** Angular controllers ** -->
-      <script type="text/javascript" src="lib/angular.min.js"></script>
+      <script type="text/javascript" src="node_modules/angular/angular.min.js"></script>
       <script type="text/javascript" src="js/CF_HMI_Ctrl.js"></script>
    </head>
    <body>
@@ -30,38 +35,21 @@
          <div id="divValues" class="p-left p-col container-fluid">
 			<!-- Concentration Control-->
             <div class="row clearfix">
-               <div class="col-xs-12 sidebarheading">Conc Control</div>
+               <!-- <div class="col-xs-12 sidebarheading">Conc Control</div> -->
                <!-- conc controller mode -->
-               <div class="col-xs-6 column btn-div">
+               <div class="col-xs-12 column btn-div">
                   <!-- <button type="button" class="btn btn-success btn-sm btn-block" ng-disabled='(values.FC9999B1_MODE.value === 2)' ng-click="writeVals('FC9999B1_MODE',2);"> -->
-                  <button type="button" class="btn btn-success btn-sm btn-block" ng-disabled='(values.AC9999C_MODE.value === 1)' ng-click="writeVals('AC9999C_MODE',1);">
-                     <span class="glyphicon glyphicon-ok"></span> CC Auto
+                  <button type="button" class="btn btn-success btn-md btn-block" ng-disabled='(values.AC9999C_MODE.value === 1)' ng-click="writeVals('AC9999C_MODE',1);">
+                     <span class="glyphicon glyphicon-ok"></span> CC Auto 
                   </button>
                </div>
-               <div class="col-xs-6 column btn-div">
-                  <button type="button" class="btn btn-danger btn-sm btn-block active" ng-disabled='(values.AC9999C_MODE.value === 0)' ng-click="writeVals('AC9999C_MODE',0);">
-                  <!-- <button type="button" class="btn btn-danger btn-sm btn-block active" ng-disabled='(values.FC9999B2_MODE.value === 1)' ng-click="writeVals('FC9999B2_MODE',1);"> -->
-                     <span class="glyphicon glyphicon-remove"></span> CC Manual
-                  </button>
-               </div>
-			   <!-- conc controller FILLING mode -->
-               <div class="col-xs-6 column btn-div">
-                  <!-- <button type="button" class="btn btn-success btn-sm btn-block" ng-disabled='(values.FC9999B1_MODE.value === 2)' ng-click="writeVals('FC9999B1_MODE',2);"> -->
-                  <button type="button" class="btn btn-success btn-sm btn-block" ng-disabled='(values.AC9999C_fillMODE.value === 1 || values.AC9999C_MODE.value === 0)' ng-click="writeVals('AC9999C_fillMODE',true);">
-                     <span class="glyphicon glyphicon-ok"></span> FillMode ON
-                  </button>
-               </div>
-               <div class="col-xs-6 column btn-div">
-                  <button type="button" class="btn btn-danger btn-sm btn-block active" ng-disabled='(values.AC9999C_fillMODE.value === 0 || values.AC9999C_MODE.value === 0)' ng-click="writeVals('AC9999C_fillMODE',false);">
-                  <!-- <button type="button" class="btn btn-danger btn-sm btn-block active" ng-disabled='(values.FC9999B2_MODE.value === 1)' ng-click="writeVals('FC9999B2_MODE',1);"> -->
-                     <span class="glyphicon glyphicon-remove"></span> FillMode OFF
-                  </button>
-               </div>
+            </div>
+			</br>  
 			   <!-- Display Fill MODE 
                <div class="col-xs-4 column config-entries config-entries-btn text-right">Fill Mode:</div>
                <div class="col-xs-5 column config-entries config-entries-btn">{{values.AC9999C_fillMODE.value}}</div>
 				-->
-				
+			<div ng-hide="(values.AC9999C_MODE.value===0)" class="row clearfix">
 			   <!-- total flow setpoint -->
                <div class="input-group">
                   <div class="config-entries input-group-addon">SP:</div>
@@ -88,10 +76,36 @@
                            <span class="glyphicon glyphicon-remove"></span></button>
                   </div>
                </div>
+			   
+			   <!-- conc controller FILLING mode -->
+               <div class="col-xs-6 column btn-div">
+                  <!-- <button type="button" class="btn btn-success btn-sm btn-block" ng-disabled='(values.FC9999B1_MODE.value === 2)' ng-click="writeVals('FC9999B1_MODE',2);"> -->
+                  <button type="button" class="btn btn-success btn-sm btn-block" ng-disabled='(values.AC9999C_fillMODE.value === 1 || values.AC9999C_MODE.value === 0)' ng-click="writeVals('AC9999C_fillMODE',1);">
+                     <span class="glyphicon glyphicon-ok"></span> FillMode ON
+                  </button>
+               </div>
+               <div class="col-xs-6 column btn-div">
+                  <button type="button" class="btn btn-danger btn-sm btn-block active" ng-disabled='(values.AC9999C_fillMODE.value === 0 || values.AC9999C_MODE.value === 0)' ng-click="writeVals('AC9999C_fillMODE',0);">
+                  <!-- <button type="button" class="btn btn-danger btn-sm btn-block active" ng-disabled='(values.FC9999B_MODE.value === 1)' ng-click="writeVals('FC9999B_MODE',1);"> -->
+                     <span class="glyphicon glyphicon-remove"></span> FillMode OFF
+                  </button>
+               </div>
 			</div>
 			</br>
+			
+			<div class="row clearfix">
+			<!-- Conc Control OFF -->
+			<div class="col-xs-12 column btn-div">
+                  <button type="button" class="btn btn-danger btn-md btn-block active" ng-disabled='(values.AC9999C_MODE.value === 0)' ng-click="writeVals('AC9999C_MODE',0);">
+                  <!-- <button type="button" class="btn btn-danger btn-sm btn-block active" ng-disabled='(values.FC9999B_MODE.value === 1)' ng-click="writeVals('FC9999B_MODE',1);"> -->
+                     <span class="glyphicon glyphicon-remove"></span> CC Manual
+                  </button>
+            </div>
+			</div>
+			
             <!-- API Pump -->
-            <div class="row clearfix">
+            <div ng-hide="(values.AC9999C_MODE.value===1)" class="row clearfix">
+			<hr class="xs"/>
                <div class="col-xs-12 sidebarheading">API Pump</div>
                <div class="col-xs-6 column btn-div">
                   <button type="button" class="btn btn-success btn-sm btn-block" ng-disabled='(values.P9999A_RUN.value === true || values.P9999A_LOCAL.value === true)' ng-click="writeVals('P9999A_Run_RQ',1);">
@@ -103,6 +117,7 @@
                      <span class="glyphicon glyphicon-stop"></span> Stop
                   </button>
                </div>
+
                <div class="col-xs-4 column btn-div">
                   <button type="button" class="btn btn-default btn-sm btn-block" ng-disabled='(values.P9999A_LOCAL.value === false)' ng-click="writeVals('P9999A_Local_RQ',0);">Remote</button>
                </div>
@@ -134,33 +149,35 @@
                <!-- flow controller mode -->
                <div class="col-xs-6 column btn-div">
                   <!-- <button type="button" class="btn btn-success btn-sm btn-block" ng-disabled='(values.FC9999A1_MODE.value === 2)' ng-click="writeVals('FC9999A1_MODE',2);"> -->
-                  <button type="button" class="btn btn-success btn-sm btn-block" ng-disabled='(values.FC9999A2_MODE.value === 2)' ng-click="writeVals('FC9999A2_MODE',2);">
+                  <button type="button" class="btn btn-success btn-sm btn-block" ng-disabled='(values.FC9999A_MODE.value === 2)' ng-click="writeVals('FC9999A_MODE',2);">
                      <span class="glyphicon glyphicon-ok"></span> FC Auto
                   </button>
                </div>
                <div class="col-xs-6 column btn-div">
-                  <button type="button" class="btn btn-danger btn-sm btn-block active" ng-disabled='(values.FC9999A1_MODE.value === 4)' ng-click="writeVals('FC9999A1_MODE',4);">
-                  <!-- <button type="button" class="btn btn-danger btn-sm btn-block active" ng-disabled='(values.FC9999A2_MODE.value === 1)' ng-click="writeVals('FC9999A2_MODE',1);"> -->
+                  <button type="button" class="btn btn-danger btn-sm btn-block active" ng-disabled='(values.FC9999A_MODE.value === 1)' ng-click="writeVals('FC9999A   _MODE',1);">
+                  <!-- <button type="button" class="btn btn-danger btn-sm btn-block active" ng-disabled='(values.FC9999A_MODE.value === 1)' ng-click="writeVals('FC9999A_MODE',1);"> -->
                      <span class="glyphicon glyphicon-remove"></span> FC Manual
                   </button>
                </div>
                <!-- flow setpoint -->
                <div class="input-group">
                   <div class="config-entries input-group-addon">SP:</div>
-                  <input type="number" class="config-entries form-control" ng-model="ctlValues.write.FC9999A2_SP.input" ng-focus="ctlValues.write.FC9999A2_SP.input = values.FC9999A2_SP.value" max="200" min="0" id="inputFC9999A2_SP" placeholder="Flow SP">
+                  <input type="number" class="config-entries form-control" ng-model="ctlValues.write.FC9999A_SP.input" ng-focus="ctlValues.write.FC9999A_SP.input = values.FC9999A_SP.value" max="200" min="0" id="inputFC9999A_SP" placeholder="Flow SP">
                   <div class="config-entries input-group-addon">ml/min
-                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.FC9999A2_SP.input==null"
-                           ng-click="writeVals('FC9999A2_SP',ctlValues.write.FC9999A2_SP.input);ctlValues.write.FC9999A2_SP.input=null;">
+                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.FC9999A_SP.input==null"
+                           ng-click="writeVals('FC9999A_SP',ctlValues.write.FC9999A_SP.input);ctlValues.write.FC9999A_SP.input=null;">
                            <span class="glyphicon glyphicon-ok"></span></button>
-                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.FC9999A2_SP.input==null"
-                           ng-click="ctlValues.write.FC9999A2_SP.input=null;">
+                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.FC9999A_SP.input==null"
+                           ng-click="ctlValues.write.FC9999A_SP.input=null;">
                            <span class="glyphicon glyphicon-remove"></span></button>
                   </div>
                </div>
             </div>
 			</br>
+			
             <!-- Buffer Pump -->
-            <div class="row clearfix">
+            <div ng-hide="(values.AC9999C_MODE.value===1)" class="row clearfix">
+			<hr class="xs"/>
                <div class="col-xs-12 sidebarheading">Buffer Pump</div>
                <div class="col-xs-6 column btn-div">
                   <button type="button" class="btn btn-success btn-sm btn-block" ng-disabled='(values.P9999B_RUN.value === true || values.P9999B_LOCAL.value === true)' ng-click="writeVals('P9999B_Run_RQ',1);">
@@ -203,68 +220,49 @@
                <!-- flow controller mode -->
                <div class="col-xs-6 column btn-div">
                   <!-- <button type="button" class="btn btn-success btn-sm btn-block" ng-disabled='(values.FC9999B1_MODE.value === 2)' ng-click="writeVals('FC9999B1_MODE',2);"> -->
-                  <button type="button" class="btn btn-success btn-sm btn-block" ng-disabled='(values.FC9999B2_MODE.value === 2)' ng-click="writeVals('FC9999B2_MODE',2);">
+                  <button type="button" class="btn btn-success btn-sm btn-block" ng-disabled='(values.FC9999B_MODE.value === 2)' ng-click="writeVals('FC9999B_MODE',2);">
                      <span class="glyphicon glyphicon-ok"></span> FC Auto
                   </button>
                </div>
                <div class="col-xs-6 column btn-div">
-                  <button type="button" class="btn btn-danger btn-sm btn-block active" ng-disabled='(values.FC9999B1_MODE.value === 4)' ng-click="writeVals('FC9999B1_MODE',4);">
-                  <!-- <button type="button" class="btn btn-danger btn-sm btn-block active" ng-disabled='(values.FC9999B2_MODE.value === 1)' ng-click="writeVals('FC9999B2_MODE',1);"> -->
+                  <button type="button" class="btn btn-danger btn-sm btn-block active" ng-disabled='(values.FC9999B_MODE.value === 1)' ng-click="writeVals('FC9999B_MODE',1);">
+                  <!-- <button type="button" class="btn btn-danger btn-sm btn-block active" ng-disabled='(values.FC9999B_MODE.value === 1)' ng-click="writeVals('FC9999B_MODE',1);"> -->
                      <span class="glyphicon glyphicon-remove"></span> FC Manual
                   </button>
                </div>
                <!-- flow setpoint -->
                <div class="input-group">
                   <div class="config-entries input-group-addon">SP:</div>
-                  <input type="number" class="config-entries form-control" ng-model="ctlValues.write.FC9999B2_SP.input" ng-focus="ctlValues.write.FC9999B2_SP.input = values.FC9999B2_SP.value" max="200" min="0" id="inputFC9999B2_SP" placeholder="Flow SP">
+                  <input type="number" class="config-entries form-control" ng-model="ctlValues.write.FC9999B_SP.input" ng-focus="ctlValues.write.FC9999B_SP.input = values.FC9999B_SP.value" max="200" min="0" id="inputFC9999B_SP" placeholder="Flow SP">
                   <div class="config-entries input-group-addon">ml/min
-                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.FC9999B2_SP.input==null"
-                           ng-click="writeVals('FC9999B2_SP',ctlValues.write.FC9999B2_SP.input);ctlValues.write.FC9999B2_SP.input=null;">
+                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.FC9999B_SP.input==null"
+                           ng-click="writeVals('FC9999B_SP',ctlValues.write.FC9999B_SP.input);ctlValues.write.FC9999B_SP.input=null;">
                            <span class="glyphicon glyphicon-ok"></span></button>
-                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.FC9999B2_SP.input==null"
-                           ng-click="ctlValues.write.FC9999B2_SP.input=null;">
+                     <button type="button" class="btn btn-xs btn-default" ng-disabled="ctlValues.write.FC9999B_SP.input==null"
+                           ng-click="ctlValues.write.FC9999B_SP.input=null;">
                            <span class="glyphicon glyphicon-remove"></span></button>
                   </div>
                </div>
             </div>
 			</br>
+			</br>
+            <hr class="xs"/>
             <!-- Totalizers -->
             <div class="row clearfix">
                <div class="col-xs-12 sidebarheading">Totalizers</div>
             </div>
-            <div class="row clearfix">
-               <!-- API totalizer -->
-               <div class="col-xs-4 column config-entries config-entries-btn text-right">API:</div>
-               <div class="col-xs-5 column config-entries config-entries-btn">{{values.FQ9999A_total.value.toFixed(1)}} mL</div>
-               <div class="col-xs-3 column btn-div">
-                  <button type="button" class="btn btn-success btn-xs btn-block" ng-click="writeVals('FQ9999A_Reset_RQ',1);">Reset</button>
-               </div> 
-               <!-- Buffer totalizer -->
-               <div class="col-xs-4 column config-entries config-entries-btn text-right">Buffer:</div>
-               <div class="col-xs-5 column config-entries config-entries-btn">{{values.FQ9999B_total.value.toFixed(1)}} mL</div>
-               <div class="col-xs-3 column btn-div">
-                  <button type="button" class="btn btn-success btn-xs btn-block" ng-click="writeVals('FQ9999B_Reset_RQ',1);">Reset</button>
-               </div>
-               <!-- Product totalizer -->
-               <div class="col-xs-4 column config-entries config-entries-btn text-right">Product:</div>
-               <div class="col-xs-5 column config-entries config-entries-btn">{{values.FQ9999C_total.value.toFixed(1)}} mL</div>
-               <div class="col-xs-3 column btn-div">
-                  <button type="button" class="btn btn-success btn-xs btn-block" ng-click="writeVals('FQ9999C_Reset_RQ',1);">Reset</button>
-               </div>
+			   <div class="col-xs-12 column btn-div">
+                  <button type="button" class="btn btn-success btn-sm btn-block" ng-click="writeVals('FQ9999_MasterReset',1)">Reset All Totalizers</button>
             </div>
-
-			
-			
-
-            <hr class="xs"/>                        
-
          </div>
+		 </br>
          <div id="divDisplay" class="p-right p-col">
             <div id="divHMI" class="p-row" ng-include="'CFDiagram.svg'">
             </div>
             <div id="divGraphs" class="p-row">
-               <p id="t1">{{values.ST9999B.PV.value}}</p>
-               <p id="t2"></p>            
+               <div id="chart-concentration" style="width:100%; height:200px;"></div>
+               </br>
+			   <div id="chart-flow" style="width:100%; height:200px;"></div>
             </div>
          </div>
 
