@@ -4,7 +4,7 @@ var TwinCAT = require("./ADSNode/TwinCAT_ADS_Node.node");
 TwinCAT.OpenCommunicationPort(CONTROLLER_NET_ID, CONTROLLER_ADS_PORT);
 
 var results = [
-	{address: 'FlowCheck.startTimes'    , key: 'start'},
+  {address: 'FlowCheck.startTimes'    , key: 'start'},
   {address: 'FlowCheck.endTimes'      , key: 'end'}, 
   {address: 'FlowCheck.spA'           , key: 'SpeedA'}, 
   {address: 'FlowCheck.spB'           , key: 'SpeedB'}, 

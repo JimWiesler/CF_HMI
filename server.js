@@ -13,6 +13,19 @@ ads.start();
 //Start web server
 var http = new w.WebServer(8000,__dirname+'/web');
 
+//Create list of arrays to read - note: this is a kludge, not clean, but good enough for now.
+// schedule it to read arrays every 500ms
+ads.arrayTags = [];
+ads.arrayUpdateMS = 2000;
+ads.arrayUpdateInterval = null;
+ads.updateInterval = function(ms) {
+   if (ads.arrayUpdateInterval != null) {
+      clearInterval(ads.arrayUpdateInterval);
+   }
+   ads.arrayUpdateInterval = setInterval(function() {ads.readArray(ads.arrayTags);}, ads.arrayUpdateMS);
+};
+ads.updateInterval(ads.arrayUpdateMS);
+
 //Create socket.io handlers
 http.io.on('connection', function (socket) {
    socket.on('ADSSubscribe', function(tags) {
@@ -24,11 +37,23 @@ http.io.on('connection', function (socket) {
    socket.on('ADSWrite', function(tags) {
       ads.write(tags);
    });
+   socket.on('ADSReadArray', function(tags) {
+      // console.log("Socket on ADSReadArray:", tags);
+      if (tags != null) {
+         for (var i = 0; i < tags.length; i++) {
+            if (ads.arrayTags.indexOf(tags[i]) == -1) {ads.arrayTags.push(tags[i]);}
+         }
+      }
+   });
 });
 
 //Create ADS event handlers
 ads.on('Updates', function(updates) {
    http.io.emit('ADSUpdates', updates);
+});
+ads.on('ReadArray', function(updates) {
+   // console.log("ADSReadArray", updates);
+   http.io.emit('ADSReadArray', updates);
 });
 
 //Create a remote node REPL instance so you can telnet directly to this server

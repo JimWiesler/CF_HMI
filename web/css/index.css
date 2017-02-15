@@ -15,11 +15,11 @@ pre.normal{background-color:transparent;border:none;border-left-width:0;overflow
 /* CSS for generic web app pane layout in panes.css - see http://blog.stevensanderson.com/2011/10/05/full-height-app-layouts-a-css-trick-to-make-it-easier/ */
 
 /* Div layout specific for this page */
-#divValues{ width: 240px;}
-#divDisplay{ left: 240px; right: 0;}
+#divValues{ width: 240px; background-color: rgba(245, 241, 220, 0.2);}
+#divDisplay{ left: 240px; right: 0; background-color: rgba(245, 241, 220, 0.3);}
 
-#divHMI{ height:500px; top: 0px; }
-#divGraphs{  top: 500px; bottom: 0px; }
+#divHMI{ height:350px; top: 0px; }
+#divGraphs{  top: 380px; bottom: 0px; }
 
 .p-header.p-row { height: 40px; top: 0px; }
 .p-body.p-row { top: 40px; bottom: 0px; }
@@ -32,11 +32,11 @@ span.File-Dirty {color:red;font-style:italic;}
 label {text-align:right;width:45%;}
 .forminput {width:52%;}
 .inputDiv {}
-div.sidebarheading {text-align: center;width=100%; vertical-align: middle;font-size:large;font-weight:400;
+div.sidebarheading {text-align: center;width=100%; vertical-align: middle;font-size:medium;font-weight:400;
    border:1px ridge #fff;
    height:30px;
    margin: 0px;
-   background: -webkit-linear-gradient(top, #c5deea 0%,#8abbd7 100%); /* from http://www.colorzilla.com/gradient-editor/ */
+   /*background: -webkit-linear-gradient(top, #c5deea 0%,#8abbd7 100%); /* from http://www.colorzilla.com/gradient-editor/ */
    }
 .vis-hidden{
      visibility: hidden;
@@ -44,7 +44,7 @@ div.sidebarheading {text-align: center;width=100%; vertical-align: middle;font-s
 
 svg {
   width:100%; height:100%;
-  background-color: beige;
+  background-color: rgba(245, 241, 220, 0.3);
   }
 
 .valve:hover {
@@ -107,7 +107,7 @@ input.svgInput {
 .input-group-xs>.input-group-addon,
 .input-group-xs>.input-group-btn>.btn {
     height: 22px;
-    padding: 1px 5px;
+    padding: 5px;
     font-size: 12px;
     line-height: 1.5;
 }
@@ -159,8 +159,8 @@ div.remainder {
 .btn-div
 {
     /* adjust padding for height*/
-   padding-top: 1px;
-   padding-bottom: 1px;
+   padding-top: 5px;
+   padding-bottom: 2px;
    padding-left: 1px;
    padding-right: 1px;
 }

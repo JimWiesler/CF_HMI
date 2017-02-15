@@ -99,6 +99,25 @@ ADS.prototype.read = function(tags) {
 };
 
 //*******************************************
+// ReadArray method
+//*******************************************
+ADS.prototype.readArray = function(tags) {
+   try {
+      var error;
+      if (!Array.isArray(tags)) {tags = [tags];}
+      if (tags.length === 0) return;
+      var t, results = [], r;
+      for (var i = 0; i < tags.length; i++) {
+         r = TwinCAT.ReadArray(tags[i]);
+         results.push({tag: tags[i], value: r})
+      }
+      this.emit('ReadArray', results);
+   } catch(err) {
+      console.log("Failed to read array via ADS : " + err);
+   }
+};
+
+//*******************************************
 // Write method
 //   Call with array of objects or single object in format {tag: 'POU.Variable', value: value}
 //*******************************************
